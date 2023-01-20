@@ -1,72 +1,57 @@
 package com.ExcelToMysqlTransfer.ExcelMysql;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.StringTokenizer;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.*;
 
 public class justForTesting {
 
     public static void main(String[] args) {
+        String jdbcURL = "jdbc:mysql://localhost:3306/spring_p";
+        String username = "root";
+        String password = "Password@1234";
 
-        try
-        {
-            //csv file containing data
-            String strFile = "/home/deeksha/Downloads/Excel-Mysql/src/main/java/com/ExcelToMysqlTransfer/ExcelMysql/ExcelToMysql.csv";
+        String csvFilePath = "/home/deeksha/Downloads/Excel-Mysql/src/main/java/com/ExcelToMysqlTransfer/ExcelMysql/testFor.csv";
 
-            // create BufferedReader to read csv file
-            BufferedReader br = new BufferedReader( new FileReader(strFile));
-            String strLine = "";
-            StringTokenizer st = null;
-            int lineNumber = 0, tokenNumber = 0;
+        try (Connection connection = DriverManager.getConnection(jdbcURL, username, password)) {
+            String sql = "SELECT * FROM employee";
 
-            //read comma separated file line by line
-            while( (strLine = br.readLine()) != null)
-            {
-                lineNumber++;
+            Statement statement = connection.createStatement();
 
-                //break comma separated line using ","
-                st = new StringTokenizer(strLine, ",");
+            ResultSet result = statement.executeQuery(sql);
 
-                while(st.hasMoreTokens())
-                {
-                    //display csv values
-                    tokenNumber++;
-                    System.out.println("Line # " + lineNumber +
-                            ", Token # " + tokenNumber
-                            + ", Token : "+ st.nextToken());
-                }
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(csvFilePath));
 
-                //reset token number
-                tokenNumber = 0;
+            // write header line containing column names
+            fileWriter.write("id,email,first_name,last_name,address");
 
+            while (result.next()) {
+                int Id = result.getInt("id");
+                String Email = result.getString("email");
+                String First_name = result.getString("first_name");
+                String Last_name = result.getString("last_name");
+                String Address = result.getString("address");
+
+                String line = String.format("%d\"%s\",%s,%s,%s",
+                       Id,Email, First_name, Last_name , Address);
+
+                fileWriter.newLine();
+                fileWriter.write(line);
             }
 
+            statement.close();
+            fileWriter.close();
 
+        } catch (SQLException e) {
+            System.out.println("Datababse error:");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("File IO error:");
+            e.printStackTrace();
         }
-        catch(Exception e)
-        {
-            System.out.println("Exception while reading csv file: " + e);
-        }
+
     }
+
 }
-
-/*
-Input csv file
-"one","two","three","four"
-"parsing","comma","separated","file","java","example"
-*/
-
-/*
-Output would be,
-Line # 1, Token # 1, Token : "one"
-Line # 1, Token # 2, Token : "two"
-Line # 1, Token # 3, Token : "three"
-Line # 1, Token # 4, Token : "four"
-Line # 2, Token # 1, Token : "parsing"
-Line # 2, Token # 2, Token : "comma"
-Line # 2, Token # 3, Token : "separated"
-Line # 2, Token # 4, Token : "file"
-Line # 2, Token # 5, Token : "java"
-Line # 2, Token # 6, Token : "example"
-*/
