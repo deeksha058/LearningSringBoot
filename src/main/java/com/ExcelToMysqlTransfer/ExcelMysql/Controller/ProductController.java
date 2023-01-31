@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin("*")  // * means client from any origin can use it.....
@@ -48,6 +47,10 @@ public class ProductController {
             throw new RuntimeException(e);
         }
 
+    @GetMapping ("/product/hit")
+    public List<Product> getProduct()  {
+        List<Product> products = productService.getdata();
+        return products;
     }
 
 //    @GetMapping ("/product")

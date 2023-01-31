@@ -29,10 +29,6 @@ public class ProductService {
 
     // ............... without any dependency ...........................
 
-//    public void saveindi(Product product){
-//            this.productRepo.save(product);
-//    }
-
 
     public void save(MultipartFile file){
 
@@ -48,13 +44,24 @@ public class ProductService {
     }
 
 
-//    @Scheduled(fixedDelay = 1000)
-//    public Optional<Product> getProductf(Integer id){
-//        return this.productRepo.findById(id);
-//    }
+
+    int offset = 0;
+    int limit = 3;
+
+    @Scheduled(fixedRate = 1000)
+    public List<Product> getdata() {
+
+        List<Product> Products = productRepo.productData(limit ,offset);
+        offset = offset + limit;
+        System.out.println(Products);
+
+        return Products;
+
+    }
 
 
     // using paging in spring boot using limit and offset .......
+
     public List<Product> getAllProduct(Integer pagenumber, Integer pagesize){
 
         Pageable p = PageRequest.of(pagenumber,pagesize );
@@ -64,4 +71,7 @@ public class ProductService {
         return pageContent;
     }
 }
+
+// update file in the database
+
 
