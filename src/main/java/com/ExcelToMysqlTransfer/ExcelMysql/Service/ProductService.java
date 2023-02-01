@@ -55,9 +55,14 @@ public class ProductService {
         offset = offset + limit;
         System.out.println(Products);
 
+        // it should be write in sheet ........
+        // at specific condition schedular stop......
+
         return Products;
 
     }
+
+    // .......................
 
 
     // using paging in spring boot using limit and offset .......
@@ -71,14 +76,34 @@ public class ProductService {
         return pageContent;
     }
 
-    int count = 1600;
+    int count = 3421;
     Product p = new Product();
-    @Scheduled(fixedRate = 1)
+    String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "0123456789" + "abcdefghijklmnopqrstuvxyz";
+    @Scheduled(fixedRate = 100)
     public void insertData(){
+
+        StringBuilder sb = new StringBuilder(6);
+        StringBuilder bs = new StringBuilder(6);
+
+        for (int i = 0; i < 6; i++) {
+
+            int index = (int)(AlphaNumericString.length() * Math.random());
+            int index1 = (int)(AlphaNumericString.length() * Math.random());
+
+            sb.append(AlphaNumericString.charAt(index));
+            bs.append(AlphaNumericString.charAt(index1));
+        }
+
         p.setStudentId(count);
-        p.setStudentName("krishna");
-        p.setStudentFather("sharma");
-        this.productRepo.save(p);
+        p.setStudentName(sb.toString());
+        p.setStudentFather(bs.toString());
+
+        Product pp = this.productRepo.save(p);
+
+        System.out.println(pp);
+
+        // fill data using rand function
+        // 6 word ki string form karni hai where all latter have equal probability
 
         count++;
 
