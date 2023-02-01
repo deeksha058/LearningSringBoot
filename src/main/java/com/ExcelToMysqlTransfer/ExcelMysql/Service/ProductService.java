@@ -70,6 +70,19 @@ public class ProductService {
 
         return pageContent;
     }
+
+    int count = 1600;
+    Product p = new Product();
+    @Scheduled(fixedRate = 1)
+    public void insertData(){
+        p.setStudentId(count);
+        p.setStudentName("krishna");
+        p.setStudentFather("sharma");
+        this.productRepo.save(p);
+
+        count++;
+
+    }
 }
 
 // update file in the database
