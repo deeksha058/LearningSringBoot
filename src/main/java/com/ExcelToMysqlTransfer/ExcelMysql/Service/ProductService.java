@@ -3,8 +3,8 @@ package com.ExcelToMysqlTransfer.ExcelMysql.Service;
 import com.ExcelToMysqlTransfer.ExcelMysql.Helper.NoDependencyHelper;
 import com.ExcelToMysqlTransfer.ExcelMysql.Product.Product;
 import com.ExcelToMysqlTransfer.ExcelMysql.Repository.ProductRepo;
-import com.ExcelToMysqlTransfer.ExcelMysql.Sechedular.ProductScheduled;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,10 +12,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 //@Component
 @Service
@@ -47,14 +48,42 @@ public class ProductService {
 
     int offset = 0;
     int limit = 3;
+    int count2 = 0;
+
+//    Thread thread = new Thread();
+    @Value("${file.name}")
+    private File fileNameUrl;
 
     @Scheduled(fixedRate = 1000)
-    public List<Product> getdata() {
+    public List<Product> getdata()  throws InterruptedException{
 
         List<Product> Products = productRepo.productData(limit ,offset);
         offset = offset + limit;
-        System.out.println(Products);
 
+
+        try {
+
+         BufferedWriter bwr = new BufferedWriter(new FileWriter( fileNameUrl,true));
+
+          for(Product it : Products){
+                StringBuilder sb = new StringBuilder();
+                sb.append(it);
+                System.out.println(sb);
+                bwr.newLine();
+                bwr.append(sb);
+            }
+            bwr.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(Products);
+        if(count2%3 ==0){
+            Thread.sleep(5000);                                           //  agar kisi site main specific time pr bahut jada trafic aat ahai to usko hum iski             // permanenetly stop nhi kr sakte hai
+        }
+
+
+        count2++;
         // it should be write in sheet ........
         // at specific condition schedular stop......
 
